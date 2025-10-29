@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-m">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Midnight Emporium</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for Thematic Styling -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Spectral:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Define custom fonts from Google Fonts */
+        body {
+            font-family: 'Spectral', serif;
+            /* Fallback font */
+            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+        
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+             /* Fallback font */
+            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+        
+        .font-spectral {
+            font-family: 'Spectral', serif;
+             /* Fallback font */
+            font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+        }
+
+        /* Custom scrollbar for the reading text */
+        #reading-text-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #reading-text-container::-webkit-scrollbar-track {
+            background: #1e1b4b; /* indigo-950 */
+            border-radius: 10px;
+        }
+        #reading-text-container::-webkit-scrollbar-thumb {
+            background-color: #f97316; /* orange-600 */
+            border-radius: 10px;
+            border: 2px solid #1e1b4b; /* indigo-950 */
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-200 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main App Container: The "Magic Shop" -->
+    <main class="w-full max-w-md bg-indigo-950 border-2 border-purple-900 rounded-2xl shadow-2xl shadow-orange-600/30 p-6 sm:p-8 relative">
+        
+        <!-- Background Decorative Elements -->
+        <div class="absolute inset-0 z-0 opacity-10">
+            <span class="absolute top-10 left-4 text-6xl -rotate-12 select-none">🎃</span>
+            <span class="absolute top-24 right-4 text-5xl rotate-12 select-none">💀</span>
+            <span class="absolute bottom-32 left-8 text-4xl select-none">🧪</span>
+            <span class="absolute bottom-8 right-12 text-5xl select-none">🐈‍⬛</span>
+            <span class="absolute bottom-16 left-20 text-4xl rotate-6 select-none">📖</span>
+        </div>
+
+        <!-- App Title -->
+        <header class="text-center relative z-10 mb-6">
+            <h1 class="font-cinzel text-3xl font-bold text-orange-400">The Midnight Emporium</h1>
+        </header>
+
+        <!-- =========== Welcome Screen =========== -->
+        <section id="welcome-screen" class="relative z-10">
+            <div class="bg-black/40 backdrop-blur-sm p-4 rounded-lg border border-purple-700">
+                <p id="shopkeeper-dialogue" class="text-lg italic text-gray-100 font-spectral">
+                    "Welcome, seeker. The veil is thin on this haunted eve. You've brought your own cards? How curious... Place three before me, and I shall unravel the threads of your fate."
+                </p>
+            </div>
+            <button id="start-button" class="w-full mt-6 py-3 px-6 bg-orange-600 hover:bg-orange-500 text-gray-950 font-bold font-cinzel rounded-lg shadow-lg shadow-orange-600/50 transition-all text-lg transform hover:scale-105">
+                Present Your Cards
+            </button>
+        </section>
+
+        <!-- =========== Image Capture Screen =========== -->
+        <section id="capture-screen" class="relative z-10 hidden">
+            <p class="text-center text-orange-300">Place your three cards flat in a single frame.</p>
+            
+            <!-- Drag and Drop Zone -->
+            <div id="drop-zone" class="mt-4 w-full h-72 border-2 border-dashed border-purple-400 rounded-lg flex flex-col items-center justify-center relative bg-black/30 transition-all hover:border-orange-500 hover:bg-black/50">
+                <!-- Visual Outlines -->
+                <div class="flex space-x-2 pointer-events-none">
+                    <div class="w-20 h-32 border-2 border-gray-600 rounded-md opacity-50"></div>
+                    <div class="w-20 h-32 border-2 border-gray-600 rounded-md opacity-50"></div>
+                    <div class="w-20 h-32 border-2 border-gray-600 rounded-md opacity-50"></div>
+                </div>
+                <p class="mt-4 text-gray-400 pointer-events-none">Click or drag image here</p>
+                
+                <!-- Image Preview -->
+                <img id="image-preview" class="absolute inset-0 w-full h-full object-cover rounded-lg hidden z-10" alt="Preview of uploaded cards">
+                
+                <!-- File Input (hidden) -->
+                <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+            </div>
+
+            <button id="analyze-button" class="w-full mt-6 py-3 px-6 bg-orange-600 text-gray-950 font-bold font-cinzel rounded-lg shadow-lg shadow-orange-600/50 transition-all text-lg opacity-50 cursor-not-allowed" disabled>
+                Unravel Their Fate
+            </button>
+            <button id="cancel-button" class="w-full mt-3 text-center text-gray-400 hover:text-orange-300 transition-all">
+                Perhaps another time...
+            </button>
+        </section>
+
+        <!-- =========== Loading Screen =========== -->
+        <section id="loading-screen" class="relative z-10 hidden">
+            <div class="flex flex-col items-center justify-center h-80">
+                <div class="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="mt-4 text-lg text-orange-300 font-cinzel">Consulting the spirits...</p>
+            </div>
+        </section>
+
+        <!-- =========== Reading Screen =========== -->
+        <section id="reading-screen" class="relative z-10 hidden">
+            <!-- Identified Cards Display -->
+            <h2 class="font-cinzel text-xl text-orange-400 text-center">The Cards Have Spoken:</h2>
+            <div id="cards-display" class="flex flex-wrap justify-center sm:justify-around gap-2 mt-4">
+                <!-- Cards will be injected here by JS -->
+            </div>
+
+            <!-- Shopkeeper's Reading -->
+            <h3 class="font-cinzel text-xl text-orange-400 text-center mt-6">The Shopkeeper's Vision:</h3>
+            <div id="reading-text-container" class="mt-2 bg-black/40 backdrop-blur-sm p-4 rounded-lg border border-purple-700">
+                <p id="reading-text" class="font-spectral text-gray-100 whitespace-pre-wrap"></p>
+            </div>
+
+            <button id="reset-button" class="w-full mt-6 py-3 px-6 bg-orange-600 hover:bg-orange-500 text-gray-950 font-bold font-cinzel rounded-lg shadow-lg shadow-orange-600/50 transition-all text-lg transform hover:scale-105">
+                Seek Another Fate
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Error Message Box -->
+    <div id="message-box" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 bg-red-800 text-white py-2 px-5 rounded-lg shadow-lg z-50 transition-all duration-300">
+        <p id="message-text"></p>
+    </div>
+
+    <script type="module">
+        // --- Gemini API Configuration ---
+        // IMPORTANT: Leave apiKey as ""
+        // The Canvas environment will automatically provide a key.
+        const apiKey = ""; 
+        const genaiModel = "gemini-2.5-flash-preview-09-2025";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${genaiModel}:generateContent?key=${apiKey}`;
+
+        // --- System Prompt for the AI ---
+        const systemPrompt = `You are the "Shopkeeper" of 'The Midnight Emporium,' a mystical, haunted magic shop. Your persona is enigmatic, spooky, wise, and theatrical. A "seeker" has shown you three tarot cards.
+
+Your task is to:
+1.  Identify the three (3) distinct tarot cards in the image. They are standard Rider-Waite style.
+2.  Weave their meanings into a single, cohesive, narrative reading.
+3.  Respond ONLY with a valid JSON object in the format: 
+    {"cards": ["Card Name 1", "Card Name 2", "Card Name 3"], "reading": "Your full narrative reading..."}
+
+RULES FOR THE READING:
+-   **Persona:** Maintain the spooky, Halloween-themed, wise shopkeeper persona. Use evocative language (e.g., "graveyard path," "haunted manor," "forgotten spell," "the chill of the crypt").
+-   **Narrative:** DO NOT interpret the cards one by one (e.g., "First, this card..."). Create a single, flowing story that connects all three.
+-   **Example Tone:** "Ah, I see... The [Card 1] whispers of a shadow from your past, a forgotten promise in a pumpkin patch... This has led you to the [Card 2], a challenge that stands before you like a haunted manor... But fear not, for the [Card 3] reveals the spell you must cast to find your light..."`;
+
+        // --- DOM Elements ---
+        let welcomeScreen, captureScreen, loadingScreen, readingScreen;
+        let startButton, analyzeButton, resetButton, cancelButton;
+        let dropZone, fileInput, imagePreview;
+        let cardsDisplay, readingText;
+        let messageBox, messageText;
+        
+        let imageBase64 = null;
+
+        // --- App Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get screen elements
+            welcomeScreen = document.getElementById('welcome-screen');
+            captureScreen = document.getElementById('capture-screen');
+            loadingScreen = document.getElementById('loading-screen');
+            readingScreen = document.getElementById('reading-screen');
+
+            // Get button elements
+            startButton = document.getElementById('start-button');
+            analyzeButton = document.getElementById('analyze-button');
+            resetButton = document.getElementById('reset-button');
+            cancelButton = document.getElementById('cancel-button');
+
+            // Get capture elements
+            dropZone = document.getElementById('drop-zone');
+            fileInput = document.getElementById('file-input');
+            imagePreview = document.getElementById('image-preview');
+
+            // Get output elements
+            cardsDisplay = document.getElementById('cards-display');
+            readingText = document.getElementById('reading-text');
+            messageBox = document.getElementById('message-box');
+            messageText = document.getElementById('message-text');
+
+            // --- Event Listeners ---
+            startButton.addEventListener('click', () => showScreen('capture'));
+            cancelButton.addEventListener('click', () => showScreen('welcome'));
+            resetButton.addEventListener('click', () => showScreen('welcome'));
+            analyzeButton.addEventListener('click', startAnalysis);
+
+            // File input listeners
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Drag and drop listeners
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.add('border-orange-500'), false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.remove('border-orange-500'), false);
+            });
+            dropZone.addEventListener('drop', handleFileDrop, false);
+        });
+
+        // --- Screen Management ---
+        function showScreen(screenName) {
+            // Hide all screens
+            welcomeScreen.classList.add('hidden');
+            captureScreen.classList.add('hidden');
+            loadingScreen.classList.add('hidden');
+            readingScreen.classList.add('hidden');
+
+            // Reset state on 'welcome'
+            if (screenName === 'welcome') {
+                welcomeScreen.classList.remove('hidden');
+                resetCaptureState();
+                cardsDisplay.innerHTML = '';
+                readingText.textContent = '';
+            } else if (screenName === 'capture') {
+                captureScreen.classList.remove('hidden');
+            } else if (screenName === 'loading') {
+                loadingScreen.classList.remove('hidden');
+            } else if (screenName === 'reading') {
+                readingScreen.classList.remove('hidden');
+            }
+        }
+
+        // --- File Handling ---
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleFileDrop(e) {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            processFile(file);
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            processFile(file);
+        }
+
+        function processFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                showError("The spirits only accept images...");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+                
+                // Extract base64 data
+                imageBase64 = e.target.result.split(',')[1];
+                
+                // Enable analyze button
+                analyzeButton.disabled = false;
+                analyzeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetCaptureState() {
+            imageBase64 = null;
+            imagePreview.src = '';
+            imagePreview.classList.add('hidden');
+            fileInput.value = null; // Clear file input
+            analyzeButton.disabled = true;
+            analyzeButton.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        // --- Gemini API Call ---
+        async function startAnalysis() {
+            if (!imageBase64) {
+                showError("You must present your cards first.");
+                return;
+            }
+
+            showScreen('loading');
+
+            const userPrompt = "Identify the three tarot cards in this image and provide the JSON response as instructed by the Shopkeeper.";
+
+            const payload = {
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            { text: userPrompt },
+                            {
+                                inlineData: {
+                                    // Dynamically set mimeType based on preview src
+                                    mimeType: imagePreview.src.match(/data:(image\/[^;]+);/)[1] || 'image/jpeg',
+                                    data: imageBase64
+                                }
+                            }
+                        ]
+                    }
+                ],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "cards": {
+                                type: "ARRAY",
+                                items: { type: "STRING" }
+                            },
+                            "reading": { type: "STRING" }
+                        },
+                        required: ["cards", "reading"]
+                    }
+                }
+            };
+            
+            try {
+                const response = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!text) {
+                    throw new Error("The spirits are silent. No reading was returned.");
+                }
+
+                // Parse the JSON string from the model
+                const data = JSON.parse(text);
+
+                if (!data.cards || !data.reading) {
+                     throw new Error("The vision is incomplete. Invalid data from spirits.");
+                }
+
+                // Success! Render the reading.
+                renderReading(data.cards, data.reading);
+                showScreen('reading');
+
+            } catch (error) {
+                console.error("Error during analysis:", error);
+                showError("The vision is clouded... Please try again.");
+                showScreen('capture'); // Go back to capture screen on error
+            }
+        }
+
+        // --- Render Output ---
+        function renderReading(cards, reading) {
+            cardsDisplay.innerHTML = ''; // Clear previous cards
+            
+            if (cards.length === 0) {
+                 cardsDisplay.innerHTML = `<p class="text-gray-400 italic">The cards remained hidden...</p>`;
+            }
+
+            cards.forEach(cardName => {
+                const urlName = cardName.replace(/\s+/g, '+');
+                const cardImageSrc = `https://placehold.co/150x250/301934/FFFFFF?text=${urlName}`;
+                
+                const cardHTML = `
+                    <div class="p-2 bg-gray-900 border-2 border-yellow-700 rounded-lg shadow-lg shadow-yellow-600/20 w-24">
+                        <img src="${cardImageSrc}" alt="${cardName}" class="w-full h-auto rounded-md">
+                        <p class="font-cinzel text-xs text-yellow-400 text-center mt-1 break-words">${cardName}</p>
+                    </div>
+                `;
+                cardsDisplay.innerHTML += cardHTML;
+            });
+
+            readingText.textContent = reading;
+        }
+
+        // --- Utility Functions ---
+        function showError(message) {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Exponential backoff for API calls
+        async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (response.status === 429 || response.status >= 500) {
+                    // Throttling or server error
+                    if (retries > 0) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                    } else {
+                        throw new Error("API rate limit exceeded or server error.");
+                    }
+                }
+                return response;
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>
+
